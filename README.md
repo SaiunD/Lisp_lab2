@@ -116,13 +116,13 @@ NIL
 ```lisp
 CL-USER> (defun duplicate-inner-alt (e res n) 
            (if (> n 0)
-               (duplicate-inner e (cons e res) (- n 1))
+               (duplicate-inner-alt e (cons e res) (- n 1))
                res))
 DUPLICATE-INNER-ALT
 CL-USER> (defun duplicate-elements-alt (lst n)
            (let ((result '()))  
              (dolist (elem lst) 
-               (setq result (nconc result (duplicate-inner elem nil n)))) 
+               (setq result (nconc result (duplicate-inner-alt elem nil n)))) 
              result))
 DUPLICATE-ELEMENTS-ALT
 ```
