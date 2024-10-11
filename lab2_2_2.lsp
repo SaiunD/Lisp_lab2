@@ -1,12 +1,12 @@
 (defun duplicate-inner-alt (e res n) 
            (if (> n 0)
-               (duplicate-inner e (cons e res) (- n 1))
+               (duplicate-inner-alt e (cons e res) (- n 1))
                res))
 
 (defun duplicate-elements-alt (lst n)
            (let ((result '()))  
              (dolist (elem lst) 
-               (setq result (nconc result (duplicate-inner elem nil n)))) 
+               (setq result (nconc result (duplicate-inner-alt elem nil n)))) 
              result))
 
 (defun check-duplicate-alt (name input-lst input-n expected) 
