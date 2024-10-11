@@ -48,7 +48,13 @@ REVERSE-AND-NEST-HEAD
 ```
 ### Тестові набори
 ```lisp
-(defun test-reverse ()
+CL-USER> (defun check-reverse-and-nest-head (name input expected)
+           "Execute `reverse-and-nest-head' on `input', compare result with `expected' and print comparison status"
+           (format t "~:[FAILED~;passed~]... ~a~%" 
+                   (equal (reverse-and-nest-head input) expected) 
+                   name))
+CHECK-REVERSE-AND-NEST-HEAD
+CL-USER> (defun test-reverse ()
            (check-reverse-and-nest-head "test-1" '(a b c) '(((c) b) a))
            (check-reverse-and-nest-head "test-2" '((a) (b) (c)) '((((c)) (b)) (a)))
            (check-reverse-and-nest-head "test-3" '(a b c ()) '((((nil) c) b) a))
@@ -68,18 +74,25 @@ NIL
 ## Лістинг функції `duplicate-elements`
 ```lisp
 CL-USER> (defun duplicate-inner (e n)
-           (when (> n 0)
-             (cons e (duplicate-inner e (- n 1)))))
+           (if (> n 0)
+               (cons e (duplicate-inner e (- n 1)))
+               nil))
 DUPLICATE-INNER
 CL-USER> (defun duplicate-elements (lst n)
            (when lst
-             (nconc (duplicate-inner (car lst) n)
+             (append (duplicate-inner (car lst) n)
                     (duplicate-elements (cdr lst) n))))
 DUPLICATE-ELEMENTS
 ```
 
 ### Тестові набори
 ```lisp
+CL-USER> (defun check-duplicate (name input-lst input-n expected) 
+           "Execute `duplicate-elements' on `input', compare result with `expected' and print comparison status" 
+           (format t "~:[FAILED~;passed~]... ~a~%" 
+                   (equal (duplicate-elements input-lst input-n) expected) 
+                   name))
+CHECK-DUPLICATE
 CL-USER> (defun test-duplicate-elements ()
            (check-duplicate "test-1" '(a b c) 3 '(a a a b b b c c c))
            (check-duplicate "test-2" '((a) b c) 2 '((a) (a) b b c c))
@@ -91,6 +104,48 @@ TEST-DUPLICATE-ELEMENTS
 ### Тестування
 ```lisp
 CL-USER> (test-duplicate-elements)
+passed... test-1
+passed... test-2
+passed... test-3
+passed... test-4
+NIL
+```
+
+## Лістинг додаткової реалізації функції `duplicate-elements`
+В альтернативній версії реалізована хвостова рекурсія та цикл
+```lisp
+CL-USER> (defun duplicate-inner-alt (e res n) 
+           (if (> n 0)
+               (duplicate-inner e (cons e res) (- n 1))
+               res))
+DUPLICATE-INNER-ALT
+CL-USER> (defun duplicate-elements-alt (lst n)
+           (let ((result '()))  
+             (dolist (elem lst) 
+               (setq result (nconc result (duplicate-inner elem nil n)))) 
+             result))
+DUPLICATE-ELEMENTS-ALT
+```
+
+### Тестові набори
+```lisp
+CL-USER> (defun check-duplicate-alt (name input-lst input-n expected) 
+           "Execute `duplicate-elements-alt' on `input', compare result with `expected' and print comparison status" 
+           (format t "~:[FAILED~;passed~]... ~a~%" 
+                   (equal (duplicate-elements-alt input-lst input-n) expected) 
+                   name))
+CHECK-DUPLICATE-ALT
+CL-USER> (defun test-duplicate-elements-alt ()
+           (check-duplicate-alt "test-1" '(a b c) 3 '(a a a b b b c c c))
+           (check-duplicate-alt "test-2" '((a) b c) 2 '((a) (a) b b c c))
+           (check-duplicate-alt "test-3" '(() a) 3 '(nil nil nil a a a))
+           (check-duplicate-alt "test-4" '(a b c) 0 nil))
+TEST-DUPLICATE-ELEMENTS-ALT
+```
+
+### Тестування
+```lisp
+CL-USER> (test-duplicate-elements-alt)
 passed... test-1
 passed... test-2
 passed... test-3
